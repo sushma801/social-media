@@ -2,51 +2,50 @@ import React, { useState } from "react";
 import { MdPermMedia } from "react-icons/md";
 import Modal from "./Modal";
 import PostCart from "./PostCart";
+import { gql, useMutation, useQuery } from "@apollo/client";
 const PostCreator = () => {
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
-  const [image, setImage] = useState<string | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [isImageConfirmed, setIsImageConfirmed] = useState<boolean>(false);
+  const [createPost] = useMutation(CREATE_NEW_POST);
+  const [deletePost] = useMutation(DELETE_POST_BY_ID);
+  const { loading, data } = useQuery(FETCH_ALL_POSTS);
 
   const handleMediaClick = () => {
     setIsMediaModalOpen(!isMediaModalOpen);
   };
   const handleMediaClose = () => {
-    console.log("media close is click");
     setIsMediaModalOpen(!isMediaModalOpen);
   };
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-
-    if (file && file.type.startsWith("image/")) {
-      setImage(file);
-      const url = URL.createObjectURL(file);
-      setImageUrl(url);
-    } else {
-      alert("Please upload a valid image file.");
+  const handleConfirm = async (data: string) => {
+    try {
+      if (data) {
+        alert(`Are you sure to upload this?`);
+        await createPost({
+          variables: { body: data },
+          refetchQueries: [{ query: FETCH_ALL_POSTS }],
+        });
+      }
+      handleMediaClose();
+    } catch (e) {
+      console.log(e);
     }
   };
 
-  const handleImageConfirm = () => {
-    if (image) {
-      alert("Are you sure to upload this?");
-      setIsImageConfirmed(true);
-      setImage(null);
+  const handleDeletePost = async (postId: string) => {
+    try {
+      const res = await deletePost({
+        variables: { postId },
+        refetchQueries: [{ query: FETCH_ALL_POSTS }],
+      });
+      alert(`${res.data.deletePost}`);
+    } catch (e) {
+      console.log("post is not deleted yet");
     }
-    handleMediaClose();
-  };
-
-  const handleDeletePost = () => {
-    setImage(null);
-    setImageUrl(null);
-    URL.revokeObjectURL(imageUrl);
-    setIsImageConfirmed(!isImageConfirmed);
   };
 
   return (
     <div className="flex flex-col w-[70%] gap-4">
-      <div className="flex flex-col gap-y-2 p-4 shadow-md h-[9.5rem]  backdrop-blur-lg bg-opacity-0 backdrop-filter  rounded-lg">
+      <div className="flex flex-col gap-y-2 p-4 shadow-md h-[10rem]  backdrop-blur-lg bg-opacity-0 backdrop-filter  rounded-lg">
         <div className="flex gap-x-8">
           <div className="w-16 h-16 rounded-full overflow-hidden">
             <img
@@ -67,24 +66,72 @@ const PostCreator = () => {
             onClick={handleMediaClick}
           >
             <MdPermMedia />
-            <span>Media</span>
+            <span className="p-2">Write a Post</span>
           </button>
         </div>
       </div>
 
       {/* Post cart */}
-      {isImageConfirmed && (
+      {/* {isImageConfirmed && (
         <PostCart imageUrl={imageUrl} handleDeletePost={handleDeletePost} />
+      )} */}
+      {data?.getPosts.length > 0 ? (
+        data?.getPosts.map(
+          (
+            data: {
+              body: string | null;
+              username: string | undefined;
+              id: string;
+            },
+            index: React.Key | null | undefined
+          ) => (
+            <PostCart
+              postDetails={data.body}
+              userName={data.username}
+              key={index}
+              id={data.id}
+              handleDeletePost={handleDeletePost}
+            />
+          )
+        )
+      ) : (
+        <></>
       )}
 
       <Modal
         open={isMediaModalOpen}
         handleClose={handleMediaClose}
-        handleFileUpload={handleImageUpload}
-        handleImageConfirm={handleImageConfirm}
+        handleConfirmPost={handleConfirm}
       />
     </div>
   );
 };
+
+const FETCH_ALL_POSTS = gql`
+  {
+    getPosts {
+      id
+      body
+      username
+      createdAt
+    }
+  }
+`;
+
+const CREATE_NEW_POST = gql`
+  mutation createPost($body: String!) {
+    createPost(body: $body) {
+      id
+      username
+      body
+    }
+  }
+`;
+
+const DELETE_POST_BY_ID = gql`
+  mutation deletePost($postId: ID!) {
+    deletePost(postId: $postId)
+  }
+`;
 
 export default PostCreator;

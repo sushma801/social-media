@@ -7,6 +7,7 @@ module.exports = {
     async getPosts() {
       try {
         const posts = await Post.find().sort({ createdAt: -1 });
+        console.log(posts);
         return posts;
       } catch (e) {
         console.log(e);
@@ -32,12 +33,14 @@ module.exports = {
     async createPost(_, { body }, context) {
       const user = checkAuth(context);
       console.log(user);
+
       const newPost = new Post({
         body,
         user: user.id,
         username: user.username,
         createdAt: new Date().toISOString(),
       });
+      console.log(newPost);
 
       const post = await newPost.save();
       return post;
@@ -47,6 +50,7 @@ module.exports = {
       const user = checkAuth(context);
       try {
         const post = await Post.findById({ _id: postId });
+        console.log({ post });
         if (user.username === post.username) {
           await post.deleteOne();
           return "Post deleted successfully";

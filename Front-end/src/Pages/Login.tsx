@@ -3,12 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { MdOutlineVisibility, MdOutlineVisibilityOff } from "react-icons/md";
+import { gql, useMutation } from "@apollo/client";
+import { useDispatch } from "react-redux";
+import { setAuthUser } from "../store/UserSlice";
 
 const Login = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [loginUser] = useMutation(LOGGEDIN_USER);
+
   const validationSchema = yup.object({
-    userName: yup
+    username: yup
       .string()
       .required("Username required")
       .min(3, "Too! short username")
@@ -24,14 +30,26 @@ const Login = () => {
       ),
   });
   const initialValues = {
-    userName: "",
+    username: "",
     password: "",
   };
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      try {
+        const { username, password } = values;
+        const res = await loginUser({ variables: { username, password } });
+        if (res) {
+          localStorage.setItem("authUser", JSON.stringify(res.data.login));
+          console.log(res);
+          localStorage.setItem("token", JSON.stringify(res.data.login.token));
+          dispatch(setAuthUser(res.data.login));
+          navigate("/");
+        }
+      } catch (e) {
+        console.log(e);
+      }
     },
   });
   const handlePasswordVisibility = (e) => {
@@ -49,7 +67,7 @@ const Login = () => {
           <div>
             <label
               className="label p-2 text-base font-bold label-text text-[#4287f5]"
-              htmlFor="userName"
+              htmlFor="username"
             >
               {" "}
               Username
@@ -58,15 +76,15 @@ const Login = () => {
               type="text"
               className="w-full input input-bordered h-10 bg-slate-100 p-2 m-2"
               placeholder="Enter Username"
-              name="userName"
-              id="userName"
+              name="username"
+              id="username"
               onChange={formik.handleChange}
-              value={formik.values.userName}
+              value={formik.values.username}
             />
             <div>
               <span className="text-red-800 font-semibold p-2 error">
-                {formik.touched.userName && formik.errors.userName
-                  ? formik.errors.userName
+                {formik.touched.username && formik.errors.username
+                  ? formik.errors.username
                   : null}
               </span>
             </div>
@@ -138,3 +156,14 @@ const Login = () => {
 };
 
 export default Login;
+
+const LOGGEDIN_USER = gql`
+  mutation login($username: String!, $password: String!) {
+    login(username: $username, password: $password) {
+      id
+      username
+      email
+      token
+    }
+  }
+`;

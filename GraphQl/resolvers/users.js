@@ -24,11 +24,15 @@ module.exports = {
   Mutation: {
     async register(
       _,
-      { registerInput: { username, password, confirmPassword, email } }
+      {
+        registerInput: { username, fullname, password, confirmPassword, email },
+      }
     ) {
+      console.log(fullname);
       // TODO validate user data
       const { valid, errors } = validateRegisterInput(
         username,
+        fullname,
         email,
         password,
         confirmPassword
@@ -50,10 +54,12 @@ module.exports = {
       const newUser = new User({
         email,
         username,
+        fullname,
         password,
         createdAt: new Date().toISOString(),
       });
       const res = await newUser.save();
+      console.log("user added successfully");
       const token = generateToken(res);
 
       return {

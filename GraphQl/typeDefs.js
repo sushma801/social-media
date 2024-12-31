@@ -25,6 +25,7 @@ module.exports = gql`
     email: String!
     token: String!
     username: String!
+    fullname: String!
     createdAt: String!
   }
   input RegisterInput {
@@ -32,6 +33,7 @@ module.exports = gql`
     password: String!
     confirmPassword: String!
     email: String!
+    fullname: String!
   }
   type Query {
     getPosts: [Post]

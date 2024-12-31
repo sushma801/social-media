@@ -3,31 +3,29 @@ import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { MdOutlineVisibility, MdOutlineVisibilityOff } from "react-icons/md";
 import { useFormik } from "formik";
-
-const genders = [
-  { value: "female", label: "Female" },
-  { value: "male", label: "Male" },
-  { value: "other", label: "Other" },
-];
+import { gql } from "@apollo/client";
+import { useRegister } from "../hooks/useRegister";
 
 const Signup = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
   const navigate = useNavigate();
+  const { loading, registerUser } = useRegister();
 
   const validationSchema = yup.object({
-    userName: yup
+    username: yup
       .string()
       .required("Required username")
       .min(3, "Too! short username")
       .max(30, "Too! long username"),
-    fullName: yup
+    email: yup.string().required("Required Email Address"),
+    fullname: yup
       .string()
       .required("Required")
       .min(2, "Too! short full name")
       .max(30, "Too! long full name"),
-    gender: yup.string().required("Required genders"),
+    // gender: yup.string().required("Required genders"),
     password: yup
       .string()
       .required("Required Password")
@@ -43,9 +41,9 @@ const Signup = () => {
       .required("Required"),
   });
   const initialValues = {
-    userName: "",
-    fullName: "",
-    gender: "",
+    username: "",
+    fullname: "",
+    email: "",
     password: "",
     confirmPassword: "",
   };
@@ -53,8 +51,20 @@ const Signup = () => {
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      try {
+        const { username, fullname, email, password, confirmPassword } = values;
+
+        await registerUser({
+          username,
+          fullname,
+          email,
+          password,
+          confirmPassword,
+        });
+      } catch (e) {
+        console.log("error while adding user");
+      }
     },
   });
   return (
@@ -68,7 +78,7 @@ const Signup = () => {
           <div>
             <label
               className="label p-2 text-base font-bold label-text text-[#4287f5]"
-              htmlFor="userName"
+              htmlFor="username"
             >
               {" "}
               Username
@@ -76,17 +86,17 @@ const Signup = () => {
             <input
               autoComplete="username"
               type="text"
-              name="userName"
-              id="userName"
+              name="username"
+              id="username"
               className="w-full input input-bordered h-10 bg-slate-100 p-2 m-2"
               placeholder="Enter Username"
               onChange={formik.handleChange}
-              value={formik.values.userName}
+              value={formik.values.username}
             />
-            {formik.touched.userName && formik.errors.userName ? (
+            {formik.touched.username && formik.errors.username ? (
               <div>
                 <span className="text-red-800 font-semibold p-2">
-                  {formik.errors.userName}
+                  {formik.errors.username}
                 </span>
               </div>
             ) : null}
@@ -94,7 +104,32 @@ const Signup = () => {
           <div>
             <label
               className="label p-2 text-base font-bold label-text text-[#4287f5]"
-              htmlFor="fullName"
+              htmlFor="email"
+            >
+              {" "}
+              Email
+            </label>
+            <input
+              type="text"
+              name="email"
+              id="email"
+              className="w-full input input-bordered h-10  bg-slate-100  p-2 m-2"
+              placeholder="Enter Email Address"
+              onChange={formik.handleChange}
+              value={formik.values.email}
+            />
+            {formik.touched.email && formik.errors.email ? (
+              <div>
+                <span className="text-red-800 font-semibold p-2">
+                  {formik.errors.email}
+                </span>
+              </div>
+            ) : null}
+          </div>
+          <div>
+            <label
+              className="label p-2 text-base font-bold label-text text-[#4287f5]"
+              htmlFor="fullname"
             >
               {" "}
               Full-Name
@@ -102,23 +137,23 @@ const Signup = () => {
             <input
               autoComplete="full-name"
               type="text"
-              name="fullName"
-              id="fullName"
+              name="fullname"
+              id="fullname"
               className="w-full input input-bordered h-10  bg-slate-100  p-2 m-2"
               placeholder="Enter Full name"
               onChange={formik.handleChange}
-              value={formik.values.fullName}
+              value={formik.values.fullname}
             />
-            {formik.touched.fullName && formik.errors.fullName ? (
+            {formik.touched.fullname && formik.errors.fullname ? (
               <div>
                 <span className="text-red-800 font-semibold p-2">
-                  {formik.errors.fullName}
+                  {formik.errors.fullname}
                 </span>
               </div>
             ) : null}
           </div>
 
-          <div className="flex flex-col ">
+          {/* <div className="flex flex-col ">
             <div className="flex  py-2  m-2">
               {genders.map((gender) => {
                 return (
@@ -150,7 +185,7 @@ const Signup = () => {
                 </span>
               </div>
             ) : null}
-          </div>
+          </div> */}
 
           <div>
             <label

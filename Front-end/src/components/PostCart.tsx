@@ -6,11 +6,17 @@ import { MdDelete } from "react-icons/md";
 import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 
 interface IPostCart {
-  imageUrl: string | null;
+  postDetails: string | null;
   userName?: string;
-  handleDeletePost: () => void;
+  handleDeletePost?: (postId: string) => void;
+  id: string;
 }
-const PostCart = ({ imageUrl, userName, handleDeletePost }: IPostCart) => {
+const PostCart = ({
+  postDetails,
+  userName,
+  id,
+  handleDeletePost,
+}: IPostCart) => {
   const [openMenuList, setOpenMenuList] = useState<null | HTMLElement>(null);
   const [followCount, setFollowCount] = useState<number>(0);
   const open = Boolean(openMenuList);
@@ -24,7 +30,10 @@ const PostCart = ({ imageUrl, userName, handleDeletePost }: IPostCart) => {
     setFollowCount(followCount + 1);
   };
   const handleDeleteButton = () => {
-    handleDeletePost();
+    // handleDeletePost();
+    if (id) {
+      handleDeletePost(id);
+    }
   };
   return (
     <div className="w-full flex flex-col items-center p-4 gap-y-4 shadow-md backdrop-blur-lg bg-opacity-0 rounded-lg backdrop-filter">
@@ -75,7 +84,11 @@ const PostCart = ({ imageUrl, userName, handleDeletePost }: IPostCart) => {
           </MenuItem>
         </Menu>
       </div>
-      {imageUrl && <img src={imageUrl} width={500} height={500} />}
+      {postDetails && (
+        <p className="border rounded-md border-[#4287f5] p-4 m-4 w-[93%] h-20">
+          {postDetails}
+        </p>
+      )}
       {
         <button
           onClick={handleFollowButton}

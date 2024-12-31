@@ -1,10 +1,24 @@
-import { Menu, MenuItem } from "@mui/material";
-import React, { useState } from "react";
+import { Divider, Menu, MenuItem } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setAuthUser } from "../store/UserSlice";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [openProfileMenu, setOpenProfileMenu] = useState<null | HTMLElement>(
     null
   );
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const logedInUserDetails = useSelector((state) => state.users.loggedInUser);
+
+  useEffect(() => {
+    const userDetails = localStorage.getItem("authUser");
+    if (userDetails) {
+      dispatch(setAuthUser(JSON.parse(userDetails)));
+    }
+  }, []);
+
   const open = Boolean(openProfileMenu);
 
   const handleClose = () => {
@@ -12,6 +26,12 @@ const Header = () => {
   };
   const handleOpenProfile = (event: React.MouseEvent<HTMLButtonElement>) => {
     setOpenProfileMenu(event.currentTarget);
+  };
+  const handleLogout = () => {
+    navigate("/");
+    localStorage.removeItem("authUser");
+    localStorage.removeItem("token");
+    dispatch(setAuthUser(null));
   };
   return (
     <div className="bg-[#4287f5] h-[10%] p-4  flex flex-row-reverse">
@@ -38,9 +58,15 @@ const Header = () => {
           "aria-labelledby": "profile-button",
         }}
       >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>My account</MenuItem>
-        <MenuItem onClick={handleClose}>Logout</MenuItem>
+        <MenuItem>{logedInUserDetails?.username}</MenuItem>
+        <Divider />
+        <MenuItem onClick={() => console.log(`My profile is click`)}>
+          Profile
+        </MenuItem>
+        <MenuItem onClick={() => console.log(`My account is click`)}>
+          My account
+        </MenuItem>
+        <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </div>
   );

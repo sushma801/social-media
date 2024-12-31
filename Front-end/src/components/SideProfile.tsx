@@ -1,6 +1,8 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const SideProfile = () => {
+  const logedInUserDetails = useSelector((state) => state.users.loggedInUser);
   return (
     <div className="flex flex-col gap-4 items-center p-4 shadow-md w-[25%] h-80 backdrop-blur-lg bg-opacity-0 backdrop-filter  rounded-lg">
       <div className="w-24 h-24 rounded-full overflow-hidden">
@@ -10,8 +12,7 @@ const SideProfile = () => {
           className="object-cover w-full h-full"
         />
       </div>
-      <h3>User Full Name</h3>
-      <h3>user Role</h3>
+      <h3>{logedInUserDetails?.username}</h3>
     </div>
   );
 };
