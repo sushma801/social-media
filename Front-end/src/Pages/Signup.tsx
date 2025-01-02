@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { MdOutlineVisibility, MdOutlineVisibilityOff } from "react-icons/md";
 import { useFormik } from "formik";
-import { gql } from "@apollo/client";
 import { useRegister } from "../hooks/useRegister";
 
 const Signup = () => {
@@ -11,7 +10,7 @@ const Signup = () => {
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
   const navigate = useNavigate();
-  const { loading, registerUser } = useRegister();
+  const { registerUser } = useRegister();
 
   const validationSchema = yup.object({
     username: yup

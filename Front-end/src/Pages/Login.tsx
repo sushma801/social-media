@@ -157,7 +157,7 @@ const Login = () => {
 
 export default Login;
 
-const LOGGEDIN_USER = gql`
+export const LOGGEDIN_USER = gql`
   mutation login($username: String!, $password: String!) {
     login(username: $username, password: $password) {
       id
