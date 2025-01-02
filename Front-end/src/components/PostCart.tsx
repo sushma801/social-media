@@ -20,12 +20,15 @@ const PostCart = ({
   const [openMenuList, setOpenMenuList] = useState<null | HTMLElement>(null);
   const [followCount, setFollowCount] = useState<number>(0);
   const open = Boolean(openMenuList);
+
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setOpenMenuList(event.currentTarget);
   };
+
   const handleClose = () => {
     setOpenMenuList(null);
   };
+
   const handleFollowButton = () => {
     setFollowCount(followCount + 1);
   };

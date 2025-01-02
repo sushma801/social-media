@@ -3,6 +3,7 @@ import { MdPermMedia } from "react-icons/md";
 import Modal from "./Modal";
 import PostCart from "./PostCart";
 import { gql, useMutation, useQuery } from "@apollo/client";
+
 const PostCreator = () => {
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
   const [createPost] = useMutation(CREATE_NEW_POST);

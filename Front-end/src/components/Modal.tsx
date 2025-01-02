@@ -63,7 +63,7 @@ const Modal = ({ open, handleClose, handleConfirmPost }: IModal) => {
   return (
     <Dialog open={open} fullScreen>
       <div className="flex justify-between bg-[#4287f5] h-14 p-4">
-        <h2 className="text-slate-100 text-xl font-bold">Upload Image</h2>
+        <h2 className="text-slate-100 text-xl font-bold">Add new post</h2>
         <IconButton
           aria-label="close"
           onClick={handleCloseModel}
