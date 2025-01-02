@@ -7,6 +7,7 @@ const {
   validateLoginInput,
 } = require("../../utils/validators");
 const { SECRET_KEY } = require("../../config");
+const { Query } = require(".");
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -21,6 +22,21 @@ const generateToken = (user) => {
 };
 
 module.exports = {
+  Query: {
+    async searchUser(_, { searchTerm }) {
+      console.log(`search term is loged ${searchTerm}`);
+      try {
+        // Use MongoDB's $regex operator for case-insensitive search
+        const users = await User.find({
+          username: { $regex: searchTerm, $options: "i" },
+        });
+        console.log(users);
+        return users;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  },
   Mutation: {
     async register(
       _,
