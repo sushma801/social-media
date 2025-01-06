@@ -1,10 +1,15 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
-import Signup from "./Pages/Signup";
-import Login from "./Pages/Login";
-import Home from "./Pages/Home";
-import { useEffect, useState } from "react";
+
+// import Signup from "./Pages/Signup";
+// import Login from "./Pages/Login";
+// import Home from "./Pages/Home";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+
+const Signup = lazy(() => import("./Pages/Signup"));
+const Login = lazy(() => import("./Pages/Login"));
+const Home = lazy(() => import("./Pages/Home"));
 
 function App() {
   const isUserLoggedIn = useSelector((state) => state.users.loggedInUser);
@@ -21,15 +26,39 @@ function App() {
     <Routes>
       <Route
         path="/"
-        element={authUser ? <Navigate to="/home" /> : <Login />}
+        element={
+          authUser ? (
+            <Navigate to="/home" />
+          ) : (
+            <Suspense fallback={<span>Login Page is loading</span>}>
+              <Login />
+            </Suspense>
+          )
+        }
       />
       <Route
         path="/signup"
-        element={authUser ? <Navigate to={"/home"} /> : <Signup />}
+        element={
+          authUser ? (
+            <Navigate to={"/home"} />
+          ) : (
+            <Suspense fallback={<span>Login Page is loading</span>}>
+              <Signup />
+            </Suspense>
+          )
+        }
       />
       <Route
         path="/home"
-        element={authUser ? <Home /> : <Navigate to={"/"} />}
+        element={
+          authUser ? (
+            <Suspense fallback={<span>Login Page is loading</span>}>
+              <Home />
+            </Suspense>
+          ) : (
+            <Navigate to={"/"} />
+          )
+        }
       />
     </Routes>
   );

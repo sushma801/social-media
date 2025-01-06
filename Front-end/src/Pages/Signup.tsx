@@ -270,14 +270,14 @@ const Signup = () => {
           </div>
           <div className="flex justify-between">
             <Link
-              to="/login"
+              to="/"
               className="text-sm  hover:underline hover:text-blue-800 mt-2 inline-block p-2"
             >
               Already have an account?
             </Link>
             <button
               className="text-sm text-[#4287f5] font-bold"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/")}
             >
               Login
             </button>
